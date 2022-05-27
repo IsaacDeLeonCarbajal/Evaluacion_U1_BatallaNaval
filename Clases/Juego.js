@@ -108,49 +108,6 @@ class Juego {
      */
     pedirPosiciones(cantBarcos, esBot) {
         let posiciones = []; //Posiciones de cada uno de los barcos
-
-        if (!esBot) { //Si es un turno del jugador
-            let cont = 0; //Cantidad de barcos ingresados
-            let error;
-
-            while (cont < cantBarcos) {
-                error = false; //Inicializar variable
-
-                alert("Barco " + (cont + 1));
-                let pos = Posicion.pedirPosicion(tamanoTablero); //Pedir la posicion del barco
-
-                if (pos != null) { //Si la posicion es valida
-                    for (let i = 0; i < cont; i++) { //Revisar el resto de posiciones
-                        if (posiciones[i].equals(pos)) { //Si la posicion ya esta ocupada
-                            alert("La posicion " + pos.toString() + " ya esta ocupada");
-                            error = true;
-                            break; //Salir del for
-                        }
-                    }
-
-                    if (!error) { //Si la posicion es valida
-                        posiciones.push(pos); //Guardar la posicion
-                        cont++;
-                    }
-                }
-            }
-        } else { //Si es un turno del bot
-            for (let i = 0; i < cantBarcos; i++) {
-                let nums = [this.enteroRandom(1, cantBarcos), this.enteroRandom(1, cantBarcos)]; //Obtener dos numeros al azar
-
-                if ((nums[0] < 1 || nums[0] > tamanoTablero) || (nums[1] < 1 || nums[1] > tamanoTablero)) { //Si alguno de los numeros está fuera del rango
-                    i--; //Reintentar
-                } else {
-
-                }
-            }
-        }
-
-        return posiciones;
-    }
-
-    pedirPosiciones(cantBarcos, esBot) {
-        let posiciones = []; //Posiciones de cada uno de los barcos
         let cont = 0; //Cantidad de barcos ingresados
         let error;
         
