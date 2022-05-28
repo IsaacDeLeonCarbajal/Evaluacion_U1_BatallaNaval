@@ -1,4 +1,4 @@
-const tamanoTablero = 5;
+var tamanoTablero = 5;
 const cantBarcos = 5;
 
 //Caracteres para mostrar como tablero
@@ -11,6 +11,14 @@ class Juego {
     constructor() { }
 
     jugar() {
+        do {
+            tamanoTablero = parseInt(prompt("Ingrese el tamanio del tablero (debe ser un numero entero mayor a 2)"));
+
+            if (isNaN(tamanoTablero) || tamanoTablero < 3) {
+                alert("El tamanio del tablero debe ser un numero entero mayor a 2");
+            }
+        } while (isNaN(tamanoTablero) || tamanoTablero < 3);
+
         //Nombre de los jugadores
         let nombre1;
         let nombre2;
@@ -55,21 +63,25 @@ class Juego {
         //Jugar
         while (ganador == "") { //Mientras no haya un ganador
             //Turno del jugador 1
+            alert("Es turno de " + nombre1);
             if (this.realizarTurno(nombre1, tablero1, posBarcos2, false)) { //Si el jugador atina el ataque
                 puntos1++; //Sumarle un punto
             }
 
+            if (puntos1 == cantBarcos) { //Si el jugador 1 alcanzó los puntos necesarios
+                ganador = nombre1;
+                break; //Salir del while
+            } 
+
             //Turno del jugador 2
+            alert("Es turno de " + nombre2);
             if (this.realizarTurno(nombre2, tablero2, posBarcos1, true)) { //Si el jugador atina el ataque
                 puntos2++; //Sumarle un punto
             }
 
-            if (puntos1 == cantBarcos && puntos2 == cantBarcos) { //Si ambos jugadores terminaron los barcos del otro en el mismo turno
-                ganador = "empate";
-            } else if (puntos1 == cantBarcos) { //Si el jugador 1 alcanzó los puntos necesarios
-                ganador = nombre1;
-            } else if (puntos2 == cantBarcos) { //Si el jugador 2 alcanzó los puntos necesarios
+            if (puntos2 == cantBarcos) { //Si el jugador 2 alcanzó los puntos necesarios
                 ganador = nombre2;
+                break; //Salir del while
             }
 
             console.log("\n\n"); //Separador
@@ -84,13 +96,8 @@ class Juego {
             console.log("\n\n --- >>> Fin del turno <<< ---\n\n");
         }
 
-        if (ganador == "empate") {
-            alert("\n\n--->>>Empate. Ambos jugadores terminaron con los barcos del otro en el mismo turno\n");
-            console.log("\n\n--->>>Empate. Ambos jugadores terminaron con los barcos del otro en el mismo turno\n\n");
-        } else {
-            alert("\n\n--->>>El ganador es " + ganador + "\n");
-            console.log("\n\n--->>>El ganador es " + ganador + "\n\n");
-        }
+        alert("\n\n--->>>El ganador es " + ganador + "\n");
+        console.log("\n\n--->>>El ganador es " + ganador + "\n\n");
 
         console.log("Tablero de " + nombre1 + ":");
         this.mostrarTablero(tablero1);
@@ -119,19 +126,7 @@ class Juego {
                 alert("Barco " + (cont + 1));
                 pos = Posicion.pedirPosicion(tamanoTablero); //Pedir la posicion del barco
             } else { //Si es un turno del bot
-                let nums;
-                let err;
-
-                do {
-                    err = false;
-                    nums = [this.enteroRandom(1, cantBarcos), this.enteroRandom(1, cantBarcos)]; //Obtener dos numeros al azar
-
-                    if ((nums[0] < 1 || nums[0] > tamanoTablero) || (nums[1] < 1 || nums[1] > tamanoTablero)) { //Si alguno de los numeros está fuera del rango
-                        err = true; //Reintentar
-                    }
-                } while (err);
-
-                pos = new Posicion(nums[0], nums[1]);
+                pos = new Posicion(this.enteroRandom(0, tamanoTablero), this.enteroRandom(0, tamanoTablero));
             }
 
             if (pos != null) { //Si la posicion es valida
@@ -165,9 +160,7 @@ class Juego {
      * @param {boolean} esBot Si es un turno del bot
      * @returns true si el ataque fue exitoso, false si no
      */
-    realizarTurno(nombre, tablero, posEnemigo, esBot) {
-        alert("Es turno de " + nombre);
-
+     realizarTurno(nombre, tablero, posEnemigo, esBot) {
         let ataque; //Posicion en la que se va a atacar
 
         if (!esBot) { //Si es un turno del jugador
@@ -181,15 +174,15 @@ class Juego {
                 }
             } while (ataque == null);
         } else { //Si es un turno del bot
-            ataque = new Posicion(this.enteroRandom(1, tamanoTablero), this.enteroRandom(1, tamanoTablero)); //Posicion en la que se va a atacar
+            ataque = new Posicion(this.enteroRandom(0, tamanoTablero), this.enteroRandom(0, tamanoTablero)); //Posicion en la que se va a atacar
 
             alert(nombre + " ataca la casilla " + ataque.toString());
         }
 
         if (tablero[ataque.x][ataque.y] == atacado || tablero[ataque.x][ataque.y] == destruido) {
-            alert("Esa posicion ya habia sido atacada");
-            console.log(nombre + " volvió a atacar la posición " + ataque.toString());
-            return false; //Indicar que el ataque no alcanzó objetivo
+            alert("Esa posicion ya habia sido atacada, vuelve a intentarlo");
+            console.log(nombre + " intentó atacar de nuevo la posición " + ataque.toString());
+            return this.realizarTurno(nombre, tablero, posEnemigo, esBot); //Volver a atacar
         } else { //Si la posicion no habia sido atacada
             for (let i = 0; i < posEnemigo.length; i++) {
                 if (posEnemigo[i].equals(ataque)) { //Si el enemigo tiene un barco en la posicion atacada
